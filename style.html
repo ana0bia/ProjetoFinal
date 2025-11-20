@@ -1,0 +1,3010 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECOS DA CIDADE - Simulador Ambiental</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --secondary: #ff9800;
+            --accent: #2196f3;
+            --text: #333;
+            --text-light: #666;
+            --background: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-hover: rgba(0, 0, 0, 0.15);
+            --danger: #f44336;
+            --warning: #ffc107;
+            --success: #4caf50;
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Telas de Autenticação */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+            transition: var(--transition);
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .auth-logo p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .optional-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: var(--text);
+            border: 1px solid #e0e0e0;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #eeeeee;
+            transform: translateY(-2px);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-light);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success);
+            font-size: 0.9rem;
+            margin-top: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+        }
+
+        /* Tela do Jogo - Layout SimCity */
+        .game-container {
+            display: none;
+            min-height: 100vh;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 25px var(--shadow);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Menu de Configurações */
+        .settings-menu {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .settings-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 25px var(--shadow);
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .settings-dropdown.show {
+            display: block;
+        }
+
+        .settings-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-item:hover {
+            background: #f5f5f5;
+        }
+
+        .settings-item i {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+        }
+
+        /* Layout Principal - SimCity Style */
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            grid-template-rows: auto 1fr auto;
+            gap: 30px;
+            min-height: 80vh;
+        }
+
+        /* Top Bar - Indicadores */
+        .top-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            grid-column: 1 / -1;
+        }
+
+        .indicator-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px var(--shadow-hover);
+        }
+
+        .indicator-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .indicator-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 1.1rem;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        }
+
+        .indicator-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .indicator-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .indicator-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .indicator-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .indicator-status {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Centro - Visualização da Cidade */
+        .city-center {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .city-visual-container {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .city-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .city-header h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .balance-display {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .city-visual {
+            background: linear-gradient(135deg, #87CEEB, #1E90FF);
+            border-radius: 12px;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #1E90FF;
+            flex: 1;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .city-visual:active {
+            cursor: grabbing;
+        }
+
+        .city-visual-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Ilha */
+        .island {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background: linear-gradient(135deg, #8BC34A, #4CAF50);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .island::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 50%);
+            border-radius: 50%;
+        }
+
+        .island::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20%;
+            background: linear-gradient(to top, #5D4037, #8D6E63);
+            border-radius: 0 0 50% 50%;
+        }
+
+        /* Áreas da ilha para construções */
+        .construction-area {
+            position: absolute;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .construction-area:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        .construction-area.residential {
+            background: rgba(255, 204, 128, 0.3);
+            border: 2px dashed #FFB74D;
+        }
+
+        .construction-area.commercial {
+            background: rgba(144, 202, 249, 0.3);
+            border: 2px dashed #64B5F6;
+        }
+
+        .construction-area.industrial {
+            background: rgba(239, 154, 154, 0.3);
+            border: 2px dashed #E57373;
+        }
+
+        .construction-area.park {
+            background: rgba(165, 214, 167, 0.3);
+            border: 2px dashed #81C784;
+        }
+
+        .construction-area.infrastructure {
+            background: rgba(179, 157, 219, 0.3);
+            border: 2px dashed #9575CD;
+        }
+
+        .construction-area.educational {
+            background: rgba(244, 143, 177, 0.3);
+            border: 2px dashed #F06292;
+        }
+
+        .construction-area.environmental {
+            background: rgba(128, 222, 234, 0.3);
+            border: 2px dashed #4DD0E1;
+        }
+
+        .construction-area.power {
+            background: rgba(255, 245, 157, 0.3);
+            border: 2px dashed #FFEB3B;
+        }
+
+        .construction-area.water {
+            background: rgba(129, 212, 250, 0.3);
+            border: 2px dashed #4FC3F7;
+        }
+
+        .construction-area.sewage {
+            background: rgba(188, 170, 164, 0.3);
+            border: 2px dashed #8D6E63;
+        }
+
+        /* Construções */
+        .building {
+            position: absolute;
+            transition: all 0.5s ease;
+            transform-origin: bottom;
+            animation: buildAnimation 0.8s ease-out;
+            z-index: 5;
+        }
+
+        @keyframes buildAnimation {
+            0% { transform: scale(0.1) translateY(50px); opacity: 0; }
+            70% { transform: scale(1.1) translateY(-5px); opacity: 0.8; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .building:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        /* Casas */
+        .house {
+            width: 60px;
+            height: 50px;
+            background: #FFCC80;
+            position: relative;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .house::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 15px solid #E65100;
+        }
+
+        .house::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            width: 15px;
+            height: 20px;
+            background: #5D4037;
+            border-radius: 2px;
+        }
+
+        .house.window {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 10px;
+            height: 10px;
+            background: #81D4FA;
+            border-radius: 1px;
+        }
+
+        /* Prédios */
+        .apartment {
+            width: 50px;
+            height: 80px;
+            background: #90CAF9;
+            position: relative;
+            border-radius: 3px;
+        }
+
+        .apartment::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 15px;
+            background: #1976D2;
+            top: 0;
+            left: 0;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .apartment .window {
+            position: absolute;
+            width: 8px;
+            height: 10px;
+            background: #FFEB3B;
+            border-radius: 1px;
+        }
+
+        .apartment .window:nth-child(2) { top: 20px; left: 10px; }
+        .apartment .window:nth-child(3) { top: 20px; right: 10px; }
+        .apartment .window:nth-child(4) { top: 35px; left: 10px; }
+        .apartment .window:nth-child(5) { top: 35px; right: 10px; }
+        .apartment .window:nth-child(6) { top: 50px; left: 10px; }
+        .apartment .window:nth-child(7) { top: 50px; right: 10px; }
+
+        /* Fábricas */
+        .factory {
+            width: 70px;
+            height: 60px;
+            background: #EF9A9A;
+            position: relative;
+            border-radius: 5px;
+        }
+
+        .factory::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            width: 30px;
+            height: 20px;
+            background: #BDBDBD;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .factory::after {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 25px;
+            width: 20px;
+            height: 10px;
+            background: #757575;
+            border-radius: 2px;
+        }
+
+        .factory .smoke {
+            position: absolute;
+            top: -40px;
+            left: 30px;
+            width: 10px;
+            height: 10px;
+            background: #9E9E9E;
+            border-radius: 50%;
+            animation: smokeAnimation 3s infinite;
+        }
+
+        @keyframes smokeAnimation {
+            0% { transform: translateY(0) scale(1); opacity: 0.7; }
+            100% { transform: translateY(-30px) scale(2); opacity: 0; }
+        }
+
+        /* Parques */
+        .park {
+            width: 80px;
+            height: 60px;
+            background: #A5D6A7;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .park::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+
+        .park::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 15px;
+            height: 15px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+
+        .park .bench {
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            width: 40px;
+            height: 5px;
+            background: #8D6E63;
+            border-radius: 2px;
+        }
+
+        .park .tree {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            width: 8px;
+            height: 20px;
+            background: #5D4037;
+        }
+
+        .park .tree::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: -8px;
+            width: 24px;
+            height: 15px;
+            background: #2E7D32;
+            border-radius: 50%;
+        }
+
+        /* Infraestrutura */
+        .infrastructure-building {
+            width: 60px;
+            height: 40px;
+            background: #B39DDB;
+            position: relative;
+            border-radius: 5px;
+        }
+
+        .infrastructure-building::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            width: 20px;
+            height: 10px;
+            background: #7E57C2;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .infrastructure-building .antenna {
+            position: absolute;
+            top: -20px;
+            left: 28px;
+            width: 4px;
+            height: 10px;
+            background: #616161;
+        }
+
+        .infrastructure-building .antenna::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            width: 10px;
+            height: 5px;
+            background: #9E9E9E;
+            border-radius: 2px;
+        }
+
+        /* Controles de zoom e navegação */
+        .city-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .control-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .zoom-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .zoom-display {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* Bottom Panel - Decisões de Compra */
+        .decisions-panel {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow);
+            grid-column: 1 / -1;
+            grid-row: 3;
+        }
+
+        .decisions-panel h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .decisions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .decision-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 8px var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .decision-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px var(--shadow-hover);
+            border-color: var(--primary-light);
+        }
+
+        .decision-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            border-color: transparent;
+        }
+
+        .decision-card.disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+
+        .decision-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .decision-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 1.4rem;
+            color: white;
+            background: linear-gradient(135deg, var(--accent), #64b5f6);
+        }
+
+        .decision-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            flex: 1;
+        }
+
+        .decision-cost {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--success);
+        }
+
+        .decision-cost.insufficient {
+            color: var(--danger);
+        }
+
+        .decision-description {
+            color: var(--text-light);
+            margin-bottom: 12px;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .decision-impact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: auto;
+        }
+
+        .impact-tag {
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .impact-positive {
+            background-color: rgba(76, 175, 80, 0.15);
+            color: var(--success);
+        }
+
+        .impact-negative {
+            background-color: rgba(244, 67, 54, 0.15);
+            color: var(--danger);
+        }
+
+        .impact-neutral {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: var(--warning);
+        }
+
+        /* Painel Lateral - Construções */
+        .side-panel {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow);
+            height: fit-content;
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .side-panel h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .construction-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .construction-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: var(--transition);
+        }
+
+        .construction-item:hover {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .construction-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        .construction-info {
+            flex: 1;
+        }
+
+        .construction-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+            font-size: 0.9rem;
+        }
+
+        .construction-details {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .construction-profit {
+            font-weight: 600;
+            color: var(--success);
+            font-size: 0.9rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px var(--shadow);
+            flex-wrap: wrap;
+            gap: 15px;
+            grid-column: 1 / -1;
+        }
+
+        .user-welcome {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid #e0e0e0;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-logout:hover {
+            background: #f5f5f5;
+            transform: translateY(-2px);
+        }
+
+        .message-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 400px;
+            z-index: 1000;
+        }
+
+        .message {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 25px var(--shadow);
+            border-left: 4px solid var(--primary);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .message.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .message-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .message-content {
+            color: var(--text-light);
+        }
+
+        /* Ranking Personalizado */
+        .ranking-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: var(--transition);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .ranking-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .ranking-item.top-1 {
+            background: linear-gradient(135deg, #fff9c4, #ffeb3b);
+            border: 2px solid #ffd600;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+        }
+
+        .ranking-item.top-2 {
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            border: 2px solid #bdbdbd;
+            box-shadow: 0 4px 12px rgba(189, 189, 189, 0.3);
+        }
+
+        .ranking-item.top-3 {
+            background: linear-gradient(135deg, #ffccbc, #ff8a65);
+            border: 2px solid #ff7043;
+            box-shadow: 0 4px 12px rgba(255, 112, 67, 0.3);
+        }
+
+        .ranking-position {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            font-weight: 700;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .ranking-position.top-1 {
+            background: linear-gradient(135deg, #ffd700, #ffa000);
+            font-size: 1.3rem;
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.4);
+        }
+
+        .ranking-position.top-2 {
+            background: linear-gradient(135deg, #c0c0c0, #808080);
+            font-size: 1.2rem;
+            box-shadow: 0 4px 8px rgba(192, 192, 192, 0.4);
+        }
+
+        .ranking-position.top-3 {
+            background: linear-gradient(135deg, #cd7f32, #8b4513);
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(205, 127, 50, 0.4);
+        }
+
+        .ranking-player {
+            flex: 1;
+        }
+
+        .ranking-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 1.1rem;
+        }
+
+        .ranking-item.top-1 .ranking-name {
+            font-size: 1.3rem;
+            color: #d4af37;
+            font-weight: 800;
+        }
+
+        .ranking-item.top-2 .ranking-name {
+            font-size: 1.2rem;
+            color: #808080;
+            font-weight: 700;
+        }
+
+        .ranking-item.top-3 .ranking-name {
+            font-size: 1.1rem;
+            color: #cd7f32;
+            font-weight: 700;
+        }
+
+        .ranking-id {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .ranking-score {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .ranking-item.top-1 .ranking-score {
+            font-size: 1.3rem;
+            color: #d4af37;
+        }
+
+        .ranking-item.top-2 .ranking-score {
+            font-size: 1.2rem;
+            color: #808080;
+        }
+
+        .ranking-item.top-3 .ranking-score {
+            font-size: 1.1rem;
+            color: #cd7f32;
+        }
+
+        /* Configurações de Som */
+        .settings-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .settings-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-container {
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .slider-label span {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .slider-value {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .save-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .save-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .save-option:hover {
+            background: #e9ecef;
+        }
+
+        .save-option-info {
+            flex: 1;
+        }
+
+        .save-option-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .save-option-desc {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .save-status {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: var(--success);
+            color: white;
+            font-weight: 600;
+        }
+
+        .save-status.off {
+            background: var(--text-light);
+        }
+
+        /* Informações da Conta */
+        .account-info {
+            padding: 20px 0;
+        }
+
+        .account-field {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .account-label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .account-value {
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        /* Animações de Dinheiro */
+        @keyframes moneyDecrease {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); color: var(--danger); }
+            100% { transform: scale(1); }
+        }
+
+        .money-decrease {
+            animation: moneyDecrease 0.5s ease-in-out;
+        }
+
+        @keyframes moneyIncrease {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); color: var(--success); }
+            100% { transform: scale(1); }
+        }
+
+        .money-increase {
+            animation: moneyIncrease 0.5s ease-in-out;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+            }
+            
+            .top-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .side-panel {
+                grid-column: 1;
+                grid-row: 3;
+            }
+            
+            .decisions-panel {
+                grid-row: 4;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .decisions-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .auth-card {
+                padding: 30px 20px;
+            }
+            
+            .city-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .settings-menu {
+                position: static;
+                margin-bottom: 15px;
+            }
+            
+            header {
+                text-align: center;
+            }
+            
+            .city-visual {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 20px;
+            }
+            
+            .auth-card {
+                padding: 20px 15px;
+            }
+            
+            .game-container {
+                padding: 10px;
+            }
+            
+            .city-controls {
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .control-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .decisions-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .decision-card {
+                padding: 15px;
+            }
+            
+            .decision-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .decision-cost {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tela de Login -->
+    <div class="auth-container" id="loginContainer">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <h1>🌱 ECOS DA CIDADE</h1>
+                <p>Simulador Ambiental Urbano</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="loginUsername">Nome de Usuário</label>
+                    <input type="text" id="loginUsername" class="form-input" placeholder="Seu nome de usuário" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="loginPassword">Senha</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="Sua senha" required>
+                </div>
+                <div class="error-message" id="loginErrorMessage"></div>
+                <div class="success-message" id="loginSuccessMessage"></div>
+                <button type="submit" class="btn btn-primary" id="loginBtn">Entrar no Simulador</button>
+                <div class="auth-footer">
+                    <p>Não tem uma conta? <a id="showRegister">Criar conta</a></p>
+                </div>
+            </form>
+            <div class="loading" id="loginLoading">Carregando...</div>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastro -->
+    <div class="auth-container" id="registerContainer" style="display: none;">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <h1>🌱 ECOS DA CIDADE</h1>
+                <p>Criar Nova Conta</p>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label" for="registerUsername">Nome de Usuário *</label>
+                    <input type="text" id="registerUsername" class="form-input" placeholder="Escolha um nome de usuário" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="registerPassword">Senha * <small>(mínimo 8 caracteres)</small></label>
+                    <input type="password" id="registerPassword" class="form-input" placeholder="Crie uma senha forte" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="registerEmail">E-mail (opcional)</label>
+                    <input type="email" id="registerEmail" class="form-input" placeholder="seu@email.com">
+                </div>
+                <div class="error-message" id="registerErrorMessage"></div>
+                <div class="success-message" id="registerSuccessMessage"></div>
+                <button type="submit" class="btn btn-primary" id="registerBtn">Criar Conta</button>
+                <div class="auth-footer">
+                    <p>Já tem uma conta? <a id="showLogin">Fazer login</a></p>
+                </div>
+            </form>
+            <div class="loading" id="registerLoading">Criando conta...</div>
+        </div>
+    </div>
+
+    <!-- Tela do Jogo -->
+    <div class="game-container" id="gameContainer">
+        <div class="user-info">
+            <div class="user-welcome">Bem-vindo, <span id="userName">Prefeito</span>!</div>
+            <button class="btn btn-logout" id="logoutBtn">Sair</button>
+        </div>
+
+        <header>
+            <!-- Menu de Configurações -->
+            <div class="settings-menu">
+                <button class="settings-btn" id="settingsBtn">⚙️</button>
+                <div class="settings-dropdown" id="settingsDropdown">
+                    <div class="settings-item" onclick="showAccountModal()">
+                        <i>👤</i>
+                        <span>Minha Conta</span>
+                    </div>
+                    <div class="settings-item" onclick="showRankingModal()">
+                        <i>🏆</i>
+                        <span>Ranking</span>
+                    </div>
+                    <div class="settings-item" onclick="showSettingsModal()">
+                        <i>🔊</i>
+                        <span>Configurações</span>
+                    </div>
+                    <div class="settings-item" onclick="saveGameManually()">
+                        <i>💾</i>
+                        <span>Salvar Jogo</span>
+                    </div>
+                </div>
+            </div>
+
+            <h1>🌱 ECOS DA CIDADE</h1>
+            <p class="subtitle">Simulador Ambiental - Equilibre desenvolvimento e sustentabilidade</p>
+        </header>
+
+        <!-- Layout Principal no estilo SimCity -->
+        <div class="game-layout">
+            <!-- Topo - Indicadores -->
+            <div class="top-panel">
+                <div class="indicator-card">
+                    <div class="indicator-header">
+                        <div class="indicator-icon">🌿</div>
+                        <div class="indicator-title">Ambiente</div>
+                    </div>
+                    <div class="indicator-value" id="envValue">75%</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="envBar" style="width: 75%; background-color: #4caf50;"></div>
+                    </div>
+                    <div class="indicator-status" id="envStatus">Boa</div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-header">
+                        <div class="indicator-icon">💼</div>
+                        <div class="indicator-title">Economia</div>
+                    </div>
+                    <div class="indicator-value" id="ecoValue">60%</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="ecoBar" style="width: 60%; background-color: #2196f3;"></div>
+                    </div>
+                    <div class="indicator-status" id="ecoStatus">Moderada</div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-header">
+                        <div class="indicator-icon">👥</div>
+                        <div class="indicator-title">Social</div>
+                    </div>
+                    <div class="indicator-value" id="socValue">80%</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="socBar" style="width: 80%; background-color: #ff9800;"></div>
+                    </div>
+                    <div class="indicator-status" id="socStatus">Excelente</div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-header">
+                        <div class="indicator-icon">🏛️</div>
+                        <div class="indicator-title">Governança</div>
+                    </div>
+                    <div class="indicator-value" id="govValue">65%</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="govBar" style="width: 65%; background-color: #9c27b0;"></div>
+                    </div>
+                    <div class="indicator-status" id="govStatus">Estável</div>
+                </div>
+            </div>
+
+            <!-- Centro - Visualização da Cidade -->
+            <div class="city-center">
+                <div class="city-visual-container">
+                    <div class="city-header">
+                        <h2>🏝️ Ilha Sustentável</h2>
+                        <div class="balance-display" id="balanceDisplay">
+                            Saldo: R$ <span id="balance">10.000</span>
+                        </div>
+                    </div>
+                    <div class="city-visual" id="cityVisual">
+                        <div class="city-visual-content" id="cityVisualContent">
+                            <div class="island" id="island">
+                                <!-- Áreas para construção serão adicionadas aqui -->
+                            </div>
+                        </div>
+                        <!-- Controles de zoom e navegação -->
+                        <div class="city-controls">
+                            <div class="zoom-controls">
+                                <button class="control-btn" id="zoomIn">+</button>
+                                <button class="control-btn" id="zoomOut">-</button>
+                                <div class="zoom-display" id="zoomDisplay">100%</div>
+                            </div>
+                            <button class="control-btn" id="resetView">⟳</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Base - Decisões de Compra -->
+            <div class="decisions-panel">
+                <h3>🏗️ Decisões de Construção</h3>
+                <div class="decisions-container" id="decisionsContainer">
+                    <!-- As decisões serão inseridas aqui via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Painel Lateral - Construções -->
+            <div class="side-panel">
+                <h3>📊 Construções Realizadas</h3>
+                <div class="construction-list" id="constructionList">
+                    <!-- Lista de construções será inserida aqui -->
+                </div>
+            </div>
+        </div>
+
+        <div class="message-container" id="messageContainer">
+            <!-- As mensagens serão inseridas aqui via JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal de Ranking -->
+    <div class="modal" id="rankingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🏆 Ranking de Jogadores</h2>
+                <button class="close-btn" onclick="closeRankingModal()">×</button>
+            </div>
+            <div class="ranking-list" id="rankingList">
+                <!-- Ranking será carregado aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal da Conta -->
+    <div class="modal" id="accountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">👤 Minha Conta</h2>
+                <button class="close-btn" onclick="closeAccountModal()">×</button>
+            </div>
+            <div class="account-info" id="accountInfo">
+                <!-- Informações da conta serão carregadas aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">⚙️ Configurações</h2>
+                <button class="close-btn" onclick="closeSettingsModal()">×</button>
+            </div>
+            <div class="settings-content">
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        <i>🔊</i>
+                        <span>Opções de Som</span>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Volume Geral</span>
+                            <span class="slider-value" id="volumeValue">50%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="slider" id="volumeSlider">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Música</span>
+                            <span class="slider-value" id="musicValue">30%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="30" class="slider" id="musicSlider">
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        <i>💾</i>
+                        <span>Opções de Salvamento</span>
+                    </div>
+                    <div class="save-options">
+                        <div class="save-option">
+                            <div class="save-option-info">
+                                <div class="save-option-title">Auto Save</div>
+                                <div class="save-option-desc">Salva automaticamente a cada 30 segundos</div>
+                            </div>
+                            <div class="save-status" id="autoSaveStatus">ON</div>
+                        </div>
+                        <div class="save-option">
+                            <div class="save-option-info">
+                                <div class="save-option-title">Manual Save</div>
+                                <div class="save-option-desc">Salva o jogo manualmente quando solicitado</div>
+                            </div>
+                            <button class="btn btn-primary" onclick="saveGameManually()" style="padding: 6px 12px; font-size: 0.8rem;">Salvar Agora</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado do jogo
+        let gameState = {
+            environment: 75,
+            economy: 60,
+            social: 80,
+            governance: 65,
+            balance: 10000,
+            turn: 1,
+            gameOver: false,
+            constructions: [],
+            score: 0,
+            lastUpdated: new Date().toISOString()
+        };
+
+        // Configurações do usuário
+        let userSettings = {
+            volume: 50,
+            music: 30,
+            autoSave: true
+        };
+
+        // Estado da visualização da cidade
+        let cityViewState = {
+            x: 0,
+            y: 0,
+            zoom: 1,
+            isDragging: false,
+            lastX: 0,
+            lastY: 0
+        };
+
+        // Decisões disponíveis
+        const decisions = [
+            {
+                id: 1,
+                title: "Parque Urbano",
+                description: "Criar um novo parque urbano com áreas verdes e espaços de lazer.",
+                icon: "🌳",
+                cost: 2000,
+                type: "park",
+                impacts: [
+                    { indicator: "environment", value: 10 },
+                    { indicator: "social", value: 8 },
+                    { indicator: "economy", value: -5 }
+                ],
+                profit: 500
+            },
+            {
+                id: 2,
+                title: "Zona Industrial",
+                description: "Aprovar a construção de uma nova zona industrial para atrair empresas.",
+                icon: "🏭",
+                cost: 5000,
+                type: "industrial",
+                impacts: [
+                    { indicator: "economy", value: 15 },
+                    { indicator: "environment", value: -12 },
+                    { indicator: "social", value: -5 }
+                ],
+                profit: 1500
+            },
+            {
+                id: 3,
+                title: "Programa de Reciclagem",
+                description: "Implementar um programa municipal de coleta seletiva e reciclagem.",
+                icon: "♻️",
+                cost: 1500,
+                type: "environmental",
+                impacts: [
+                    { indicator: "environment", value: 8 },
+                    { indicator: "social", value: 5 },
+                    { indicator: "governance", value: 3 }
+                ],
+                profit: 300
+            },
+            {
+                id: 4,
+                title: "Transporte Público",
+                description: "Expandir a rede de transporte público com ônibus elétricos.",
+                icon: "🚌",
+                cost: 4000,
+                type: "infrastructure",
+                impacts: [
+                    { indicator: "social", value: 10 },
+                    { indicator: "environment", value: 7 },
+                    { indicator: "economy", value: -8 }
+                ],
+                profit: 800
+            },
+            {
+                id: 5,
+                title: "Incentivo Fiscal",
+                description: "Oferecer incentivos fiscais para empresas sustentáveis.",
+                icon: "💸",
+                cost: 3000,
+                type: "economic",
+                impacts: [
+                    { indicator: "economy", value: 10 },
+                    { indicator: "environment", value: 5 },
+                    { indicator: "governance", value: -3 }
+                ],
+                profit: 1000
+            },
+            {
+                id: 6,
+                title: "Educação Ambiental",
+                description: "Implementar programas de educação ambiental nas escolas.",
+                icon: "📚",
+                cost: 1000,
+                type: "educational",
+                impacts: [
+                    { indicator: "social", value: 7 },
+                    { indicator: "environment", value: 6 },
+                    { indicator: "governance", value: 4 }
+                ],
+                profit: 200
+            },
+            {
+                id: 7,
+                title: "Residências",
+                description: "Construir novas residências para a população.",
+                icon: "🏠",
+                cost: 3000,
+                type: "residential",
+                impacts: [
+                    { indicator: "social", value: 8 },
+                    { indicator: "economy", value: 5 },
+                    { indicator: "environment", value: -3 }
+                ],
+                profit: 600
+            },
+            {
+                id: 8,
+                title: "Prédios Comerciais",
+                description: "Construir prédios comerciais para empresas.",
+                icon: "🏢",
+                cost: 6000,
+                type: "commercial",
+                impacts: [
+                    { indicator: "economy", value: 12 },
+                    { indicator: "social", value: 3 },
+                    { indicator: "environment", value: -5 }
+                ],
+                profit: 1200
+            },
+            {
+                id: 9,
+                title: "Rede de Esgoto",
+                description: "Expandir a rede de esgoto da cidade.",
+                icon: "🚽",
+                cost: 3500,
+                type: "sewage",
+                impacts: [
+                    { indicator: "environment", value: 7 },
+                    { indicator: "social", value: 6 },
+                    { indicator: "governance", value: 4 }
+                ],
+                profit: 400
+            },
+            {
+                id: 10,
+                title: "Hidrelétrica",
+                description: "Construir uma usina hidrelétrica para gerar energia limpa.",
+                icon: "💧",
+                cost: 8000,
+                type: "power",
+                impacts: [
+                    { indicator: "environment", value: 5 },
+                    { indicator: "economy", value: 10 },
+                    { indicator: "social", value: 3 }
+                ],
+                profit: 1500
+            }
+        ];
+
+        // Elementos DOM
+        const loginContainer = document.getElementById('loginContainer');
+        const registerContainer = document.getElementById('registerContainer');
+        const gameContainer = document.getElementById('gameContainer');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const loginErrorMessage = document.getElementById('loginErrorMessage');
+        const registerErrorMessage = document.getElementById('registerErrorMessage');
+        const loginSuccessMessage = document.getElementById('loginSuccessMessage');
+        const registerSuccessMessage = document.getElementById('registerSuccessMessage');
+        const loginLoading = document.getElementById('loginLoading');
+        const registerLoading = document.getElementById('registerLoading');
+        const decisionsContainer = document.getElementById('decisionsContainer');
+        const messageContainer = document.getElementById('messageContainer');
+        const balanceElement = document.getElementById('balance');
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const cityVisual = document.getElementById('cityVisual');
+        const cityVisualContent = document.getElementById('cityVisualContent');
+        const island = document.getElementById('island');
+        const constructionList = document.getElementById('constructionList');
+        const userName = document.getElementById('userName');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsDropdown = document.getElementById('settingsDropdown');
+        const rankingModal = document.getElementById('rankingModal');
+        const accountModal = document.getElementById('accountModal');
+        const settingsModal = document.getElementById('settingsModal');
+        const rankingList = document.getElementById('rankingList');
+        const accountInfo = document.getElementById('accountInfo');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const musicSlider = document.getElementById('musicSlider');
+        const volumeValue = document.getElementById('volumeValue');
+        const musicValue = document.getElementById('musicValue');
+        const autoSaveStatus = document.getElementById('autoSaveStatus');
+        const zoomInBtn = document.getElementById('zoomIn');
+        const zoomOutBtn = document.getElementById('zoomOut');
+        const resetViewBtn = document.getElementById('resetView');
+        const zoomDisplay = document.getElementById('zoomDisplay');
+
+        let currentUser = null;
+        let autoSaveInterval = null;
+
+        // Sistema de visualização da cidade
+        function setupCityView() {
+            // Atualizar visualização
+            updateCityView();
+            
+            // Eventos de mouse para arrastar
+            cityVisual.addEventListener('mousedown', startDrag);
+            cityVisual.addEventListener('touchstart', startDragTouch);
+            
+            // Eventos de movimento
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', dragTouch);
+            
+            // Eventos de fim de arrasto
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+            
+            // Eventos de zoom
+            zoomInBtn.addEventListener('click', zoomIn);
+            zoomOutBtn.addEventListener('click', zoomOut);
+            resetViewBtn.addEventListener('click', resetView);
+            
+            // Zoom com roda do mouse
+            cityVisual.addEventListener('wheel', handleWheel);
+            
+            // Criar áreas de construção na ilha
+            createConstructionAreas();
+        }
+
+        function createConstructionAreas() {
+            // Limpar áreas existentes
+            island.innerHTML = '';
+            
+            // Definir posições para as áreas de construção
+            const areas = [
+                { type: 'residential', top: '20%', left: '20%', width: '15%', height: '15%' },
+                { type: 'commercial', top: '20%', left: '65%', width: '15%', height: '15%' },
+                { type: 'industrial', top: '65%', left: '20%', width: '15%', height: '15%' },
+                { type: 'park', top: '65%', left: '65%', width: '15%', height: '15%' },
+                { type: 'infrastructure', top: '42%', left: '42%', width: '15%', height: '15%' },
+                { type: 'educational', top: '20%', left: '42%', width: '15%', height: '15%' },
+                { type: 'environmental', top: '42%', left: '20%', width: '15%', height: '15%' },
+                { type: 'power', top: '42%', left: '65%', width: '15%', height: '15%' },
+                { type: 'water', top: '65%', left: '42%', width: '15%', height: '15%' },
+                { type: 'sewage', top: '20%', left: '65%', width: '15%', height: '15%' }
+            ];
+            
+            // Criar áreas de construção
+            areas.forEach(area => {
+                const constructionArea = document.createElement('div');
+                constructionArea.className = `construction-area ${area.type}`;
+                constructionArea.style.top = area.top;
+                constructionArea.style.left = area.left;
+                constructionArea.style.width = area.width;
+                constructionArea.style.height = area.height;
+                constructionArea.title = `Área para ${getConstructionTypeName(area.type)}`;
+                
+                // Adicionar ícone representativo
+                const icon = document.createElement('div');
+                icon.style.fontSize = '24px';
+                icon.textContent = getIconForType(area.type);
+                constructionArea.appendChild(icon);
+                
+                island.appendChild(constructionArea);
+            });
+        }
+
+        function getConstructionTypeName(type) {
+            const names = {
+                residential: 'Residências',
+                commercial: 'Comércio',
+                industrial: 'Indústria',
+                park: 'Parques',
+                infrastructure: 'Infraestrutura',
+                educational: 'Educação',
+                environmental: 'Ambiental',
+                power: 'Energia',
+                water: 'Água',
+                sewage: 'Esgoto'
+            };
+            return names[type] || type;
+        }
+
+        function getIconForType(type) {
+            const icons = {
+                residential: '🏠',
+                commercial: '🏢',
+                industrial: '🏭',
+                park: '🌳',
+                infrastructure: '🚌',
+                educational: '📚',
+                environmental: '♻️',
+                power: '💧',
+                water: '🚰',
+                sewage: '🚽'
+            };
+            return icons[type] || '🏗️';
+        }
+
+        function startDrag(e) {
+            cityViewState.isDragging = true;
+            cityViewState.lastX = e.clientX;
+            cityViewState.lastY = e.clientY;
+            cityVisual.style.cursor = 'grabbing';
+        }
+
+        function startDragTouch(e) {
+            if (e.touches.length === 1) {
+                cityViewState.isDragging = true;
+                cityViewState.lastX = e.touches[0].clientX;
+                cityViewState.lastY = e.touches[0].clientY;
+                e.preventDefault();
+            }
+        }
+
+        function drag(e) {
+            if (!cityViewState.isDragging) return;
+            
+            const deltaX = e.clientX - cityViewState.lastX;
+            const deltaY = e.clientY - cityViewState.lastY;
+            
+            cityViewState.x += deltaX;
+            cityViewState.y += deltaY;
+            
+            cityViewState.lastX = e.clientX;
+            cityViewState.lastY = e.clientY;
+            
+            updateCityView();
+        }
+
+        function dragTouch(e) {
+            if (!cityViewState.isDragging || e.touches.length !== 1) return;
+            
+            const deltaX = e.touches[0].clientX - cityViewState.lastX;
+            const deltaY = e.touches[0].clientY - cityViewState.lastY;
+            
+            cityViewState.x += deltaX;
+            cityViewState.y += deltaY;
+            
+            cityViewState.lastX = e.touches[0].clientX;
+            cityViewState.lastY = e.touches[0].clientY;
+            
+            updateCityView();
+            e.preventDefault();
+        }
+
+        function endDrag() {
+            cityViewState.isDragging = false;
+            cityVisual.style.cursor = 'grab';
+        }
+
+        function zoomIn() {
+            cityViewState.zoom = Math.min(cityViewState.zoom * 1.2, 3);
+            updateCityView();
+        }
+
+        function zoomOut() {
+            cityViewState.zoom = Math.max(cityViewState.zoom / 1.2, 0.5);
+            updateCityView();
+        }
+
+        function resetView() {
+            cityViewState.x = 0;
+            cityViewState.y = 0;
+            cityViewState.zoom = 1;
+            updateCityView();
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                zoomIn();
+            } else {
+                zoomOut();
+            }
+        }
+
+        function updateCityView() {
+            cityVisualContent.style.transform = `translate(${cityViewState.x}px, ${cityViewState.y}px) scale(${cityViewState.zoom})`;
+            zoomDisplay.textContent = `${Math.round(cityViewState.zoom * 100)}%`;
+        }
+
+        // Alternar entre login e cadastro
+        showRegister.addEventListener('click', () => {
+            loginContainer.style.display = 'none';
+            registerContainer.style.display = 'flex';
+            clearMessages();
+        });
+
+        showLogin.addEventListener('click', () => {
+            registerContainer.style.display = 'none';
+            loginContainer.style.display = 'flex';
+            clearMessages();
+        });
+
+        function clearMessages() {
+            loginErrorMessage.style.display = 'none';
+            registerErrorMessage.style.display = 'none';
+            loginSuccessMessage.style.display = 'none';
+            registerSuccessMessage.style.display = 'none';
+        }
+
+        // Observar estado de autenticação
+        function checkAuthState() {
+            const savedUser = localStorage.getItem('ecosCityUser');
+            if (savedUser) {
+                const userData = JSON.parse(savedUser);
+                currentUser = userData;
+                userName.textContent = userData.username;
+                loginContainer.style.display = 'none';
+                registerContainer.style.display = 'none';
+                gameContainer.style.display = 'block';
+                loadGameState();
+                startAutoSave();
+            }
+        }
+
+        // Carregar estado do jogo
+        function loadGameState() {
+            const savedGame = localStorage.getItem('ecosCityGame');
+            if (savedGame) {
+                const savedState = JSON.parse(savedGame);
+                // Garantir que todas as propriedades existam
+                gameState = {
+                    ...gameState, // estado padrão
+                    ...savedState // dados salvos
+                };
+            }
+            initGame();
+        }
+
+        // Salvar estado do jogo
+        function saveGameState() {
+            gameState.lastUpdated = new Date().toISOString();
+            gameState.score = calculateScore();
+            localStorage.setItem('ecosCityGame', JSON.stringify(gameState));
+            console.log('Jogo salvo com sucesso!');
+            return true;
+        }
+
+        // Calcular pontuação
+        function calculateScore() {
+            const baseScore = gameState.turn * 100;
+            const balanceBonus = gameState.balance * 0.1;
+            const constructionBonus = gameState.constructions.length * 50;
+            const indicatorBonus = (gameState.environment + gameState.economy + gameState.social + gameState.governance) * 2;
+            
+            return Math.round(baseScore + balanceBonus + constructionBonus + indicatorBonus);
+        }
+
+        // Salvar automaticamente
+        function startAutoSave() {
+            if (autoSaveInterval) {
+                clearInterval(autoSaveInterval);
+            }
+            
+            if (userSettings.autoSave) {
+                autoSaveInterval = setInterval(() => {
+                    const saved = saveGameState();
+                    if (saved) {
+                        console.log('Jogo salvo automaticamente');
+                    }
+                }, 30000); // 30 segundos
+            }
+        }
+
+        // Salvar manualmente
+        function saveGameManually() {
+            const saved = saveGameState();
+            if (saved) {
+                showMessage("Jogo Salvo", "Seu progresso foi salvo com sucesso!");
+            }
+            closeSettingsDropdown();
+            closeSettingsModal();
+        }
+
+        // Inicializar o jogo
+        function initGame() {
+            setupCityView();
+            renderDecisions();
+            updateIndicators();
+            renderCityVisual();
+            updateConstructionList();
+            showMessage("Bem-vindo ao ECOS DA CIDADE!", "Você é o novo prefeito. Tome decisões que equilibrem desenvolvimento e sustentabilidade.");
+        }
+
+        // Renderizar as decisões
+        function renderDecisions() {
+            decisionsContainer.innerHTML = '';
+            
+            decisions.forEach(decision => {
+                const canAfford = gameState.balance >= decision.cost;
+                const decisionCard = document.createElement('div');
+                decisionCard.className = `decision-card ${!canAfford ? 'disabled' : ''}`;
+                decisionCard.innerHTML = `
+                    <div class="decision-header">
+                        <div class="decision-icon">${decision.icon}</div>
+                        <div class="decision-title">${decision.title}</div>
+                        <div class="decision-cost ${!canAfford ? 'insufficient' : ''}">R$ ${decision.cost.toLocaleString()}</div>
+                    </div>
+                    <div class="decision-description">${decision.description}</div>
+                    <div class="decision-impact">
+                        ${decision.impacts.map(impact => {
+                            const className = impact.value > 0 ? 'impact-positive' : 
+                                            impact.value < 0 ? 'impact-negative' : 'impact-neutral';
+                            const sign = impact.value > 0 ? '+' : '';
+                            return `<span class="impact-tag ${className}">${getIndicatorName(impact.indicator)}: ${sign}${impact.value}</span>`;
+                        }).join('')}
+                    </div>
+                `;
+                
+                if (canAfford) {
+                    decisionCard.addEventListener('click', () => makeDecision(decision));
+                }
+                
+                decisionsContainer.appendChild(decisionCard);
+            });
+        }
+
+        // Fazer uma decisão
+        function makeDecision(decision) {
+            if (gameState.gameOver || gameState.balance < decision.cost) return;
+            
+            animateMoneyDecrease(decision.cost);
+            gameState.balance -= decision.cost;
+            
+            const construction = {
+                id: Date.now(),
+                name: decision.title,
+                type: decision.type,
+                cost: decision.cost,
+                profit: decision.profit,
+                turn: gameState.turn,
+                level: 1
+            };
+            gameState.constructions.push(construction);
+            
+            decision.impacts.forEach(impact => {
+                gameState[impact.indicator] = Math.max(0, Math.min(100, gameState[impact.indicator] + impact.value));
+            });
+            
+            gameState.turn++;
+            processConstructionProfits();
+            
+            updateIndicators();
+            updateBalance();
+            renderCityVisual();
+            updateConstructionList();
+            renderDecisions();
+            
+            // Salvar automaticamente após cada decisão
+            saveGameState();
+            
+            showMessage(`Construção: ${decision.title}`, `Você construiu "${decision.title}" por R$ ${decision.cost.toLocaleString()}.`);
+            checkGameStatus();
+        }
+
+        // Animação de diminuição do dinheiro
+        function animateMoneyDecrease(amount) {
+            balanceDisplay.classList.add('money-decrease');
+            setTimeout(() => {
+                balanceDisplay.classList.remove('money-decrease');
+            }, 500);
+        }
+
+        // Processar lucros das construções
+        function processConstructionProfits() {
+            gameState.constructions.forEach(construction => {
+                const economyBonus = gameState.economy / 100;
+                const environmentBonus = gameState.environment / 100;
+                const profit = Math.round(construction.profit * (1 + economyBonus + environmentBonus));
+                
+                gameState.balance += profit;
+                
+                if (profit > 0) {
+                    balanceDisplay.classList.add('money-increase');
+                    setTimeout(() => {
+                        balanceDisplay.classList.remove('money-increase');
+                    }, 500);
+                }
+                
+                showMessage("Lucro Recebido", `${construction.name} gerou R$ ${profit.toLocaleString()} de lucro.`);
+            });
+        }
+
+        // Renderizar visual da cidade
+        function renderCityVisual() {
+            // Limpar construções existentes
+            const existingBuildings = island.querySelectorAll('.building');
+            existingBuildings.forEach(building => building.remove());
+            
+            // Adicionar construções
+            gameState.constructions.forEach((construction, index) => {
+                const building = document.createElement('div');
+                building.className = `building`;
+                building.title = `${construction.name}\nCusto: R$ ${construction.cost.toLocaleString()}\nLucro: R$ ${construction.profit.toLocaleString()}/turno\nNível: ${construction.level}`;
+                
+                // Posicionamento baseado no tipo
+                const positions = {
+                    residential: { top: '20%', left: '20%' },
+                    commercial: { top: '20%', left: '65%' },
+                    industrial: { top: '65%', left: '20%' },
+                    park: { top: '65%', left: '65%' },
+                    infrastructure: { top: '42%', left: '42%' },
+                    educational: { top: '20%', left: '42%' },
+                    environmental: { top: '42%', left: '20%' },
+                    power: { top: '42%', left: '65%' },
+                    water: { top: '65%', left: '42%' },
+                    sewage: { top: '20%', left: '65%' }
+                };
+                
+                const position = positions[construction.type] || { top: '50%', left: '50%' };
+                
+                building.style.top = position.top;
+                building.style.left = position.left;
+                building.style.zIndex = index;
+                
+                // Criar representação visual baseada no tipo
+                const buildingVisual = createBuildingVisual(construction.type, construction.level);
+                building.appendChild(buildingVisual);
+                
+                island.appendChild(building);
+            });
+        }
+
+        // Criar representação visual da construção
+        function createBuildingVisual(type, level) {
+            const container = document.createElement('div');
+            container.className = `building-${type}`;
+            
+            switch(type) {
+                case 'residential':
+                    container.innerHTML = `
+                        <div class="house">
+                            <div class="window"></div>
+                        </div>
+                    `;
+                    // Adicionar mais casas conforme o nível
+                    for (let i = 1; i < level; i++) {
+                        const additionalHouse = document.createElement('div');
+                        additionalHouse.className = 'house';
+                        additionalHouse.style.position = 'absolute';
+                        additionalHouse.style.top = `${i * 10}px`;
+                        additionalHouse.style.left = `${i * 15}px`;
+                        additionalHouse.innerHTML = '<div class="window"></div>';
+                        container.appendChild(additionalHouse);
+                    }
+                    break;
+                    
+                case 'commercial':
+                    container.innerHTML = `
+                        <div class="apartment">
+                            <div class="window"></div>
+                            <div class="window"></div>
+                            <div class="window"></div>
+                            <div class="window"></div>
+                            <div class="window"></div>
+                            <div class="window"></div>
+                        </div>
+                    `;
+                    // Aumentar altura conforme o nível
+                    container.style.height = `${60 + (level - 1) * 10}px`;
+                    break;
+                    
+                case 'industrial':
+                    container.innerHTML = `
+                        <div class="factory">
+                            <div class="smoke"></div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'park':
+                    container.innerHTML = `
+                        <div class="park">
+                            <div class="bench"></div>
+                            <div class="tree"></div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'infrastructure':
+                    container.innerHTML = `
+                        <div class="infrastructure-building">
+                            <div class="antenna"></div>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    // Representação padrão para outros tipos
+                    const defaultBuilding = document.createElement('div');
+                    defaultBuilding.style.width = '50px';
+                    defaultBuilding.style.height = '50px';
+                    defaultBuilding.style.background = getColorForType(type);
+                    defaultBuilding.style.borderRadius = '5px';
+                    defaultBuilding.style.display = 'flex';
+                    defaultBuilding.style.alignItems = 'center';
+                    defaultBuilding.style.justifyContent = 'center';
+                    defaultBuilding.style.fontSize = '24px';
+                    defaultBuilding.innerHTML = getIconForType(type);
+                    container.appendChild(defaultBuilding);
+                    break;
+            }
+            
+            return container;
+        }
+
+        // Atualizar lista de construções
+        function updateConstructionList() {
+            constructionList.innerHTML = '';
+            
+            if (gameState.constructions.length === 0) {
+                constructionList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Nenhuma construção realizada ainda</p>';
+                return;
+            }
+            
+            const sortedConstructions = [...gameState.constructions].sort((a, b) => b.turn - a.turn);
+            
+            sortedConstructions.forEach(construction => {
+                const item = document.createElement('div');
+                item.className = 'construction-item';
+                
+                item.innerHTML = `
+                    <div class="construction-icon" style="background: ${getColorForType(construction.type)}">
+                        ${getIconForType(construction.type)}
+                    </div>
+                    <div class="construction-info">
+                        <div class="construction-name">${construction.name} ${construction.level > 1 ? `Nv. ${construction.level}` : ''}</div>
+                        <div class="construction-details">Rodada ${construction.turn} | Custo: R$ ${construction.cost.toLocaleString()}</div>
+                    </div>
+                    <div class="construction-profit">+R$ ${construction.profit.toLocaleString()}</div>
+                `;
+                
+                constructionList.appendChild(item);
+            });
+        }
+
+        // Atualizar indicadores na interface
+        function updateIndicators() {
+            document.getElementById('envValue').textContent = `${gameState.environment}%`;
+            document.getElementById('ecoValue').textContent = `${gameState.economy}%`;
+            document.getElementById('socValue').textContent = `${gameState.social}%`;
+            document.getElementById('govValue').textContent = `${gameState.governance}%`;
+            
+            document.getElementById('envBar').style.width = `${gameState.environment}%`;
+            document.getElementById('ecoBar').style.width = `${gameState.economy}%`;
+            document.getElementById('socBar').style.width = `${gameState.social}%`;
+            document.getElementById('govBar').style.width = `${gameState.governance}%`;
+            
+            document.getElementById('envBar').style.backgroundColor = getColorForValue(gameState.environment);
+            document.getElementById('ecoBar').style.backgroundColor = getColorForValue(gameState.economy);
+            document.getElementById('socBar').style.backgroundColor = getColorForValue(gameState.social);
+            document.getElementById('govBar').style.backgroundColor = getColorForValue(gameState.governance);
+            
+            document.getElementById('envStatus').textContent = getStatusForValue(gameState.environment);
+            document.getElementById('ecoStatus').textContent = getStatusForValue(gameState.economy);
+            document.getElementById('socStatus').textContent = getStatusForValue(gameState.social);
+            document.getElementById('govStatus').textContent = getStatusForValue(gameState.governance);
+        }
+
+        // Atualizar saldo
+        function updateBalance() {
+            balanceElement.textContent = gameState.balance.toLocaleString();
+        }
+
+        // Verificar status do jogo
+        function checkGameStatus() {
+            if (gameState.environment < 20 || gameState.economy < 20 || 
+                gameState.social < 20 || gameState.governance < 20) {
+                gameState.gameOver = true;
+                showMessage("Fim de Jogo!", "Um ou mais indicadores caíram abaixo do nível crítico. A cidade entrou em colapso.");
+                disableDecisions();
+                return;
+            }
+            
+            const avg = (gameState.environment + gameState.economy + gameState.social + gameState.governance) / 4;
+            const balanced = Math.abs(gameState.environment - avg) < 15 && 
+                            Math.abs(gameState.economy - avg) < 15 && 
+                            Math.abs(gameState.social - avg) < 15 && 
+                            Math.abs(gameState.governance - avg) < 15;
+            
+            if (balanced && gameState.turn >= 10) {
+                gameState.gameOver = true;
+                showMessage("Parabéns!", "Você conseguiu equilibrar o desenvolvimento da cidade de forma sustentável!");
+                disableDecisions();
+            }
+            
+            if (gameState.balance < 0) {
+                gameState.gameOver = true;
+                showMessage("Falência!", "As finanças da cidade entraram em colapso. Game Over!");
+                disableDecisions();
+            }
+        }
+
+        // Mostrar mensagem
+        function showMessage(title, content) {
+            const message = document.createElement('div');
+            message.className = 'message';
+            message.innerHTML = `
+                <div class="message-title">${title}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            messageContainer.appendChild(message);
+            
+            setTimeout(() => {
+                message.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                message.classList.remove('show');
+                setTimeout(() => {
+                    if (messageContainer.contains(message)) {
+                        messageContainer.removeChild(message);
+                    }
+                }, 500);
+            }, 5000);
+        }
+
+        // Desabilitar decisões (fim de jogo)
+        function disableDecisions() {
+            const decisionCards = document.querySelectorAll('.decision-card');
+            decisionCards.forEach(card => {
+                card.style.opacity = '0.5';
+                card.style.cursor = 'not-allowed';
+                card.onclick = null;
+            });
+        }
+
+        // Funções auxiliares
+        function getIndicatorName(indicator) {
+            const names = {
+                environment: 'Ambiente',
+                economy: 'Economia',
+                social: 'Social',
+                governance: 'Governança'
+            };
+            return names[indicator] || indicator;
+        }
+
+        function getColorForValue(value) {
+            if (value >= 70) return '#4caf50';
+            if (value >= 40) return '#ff9800';
+            return '#f44336';
+        }
+
+        function getColorForType(type) {
+            const colors = {
+                residential: 'linear-gradient(135deg, #ffcc80, #ffb74d)',
+                commercial: 'linear-gradient(135deg, #90caf9, #64b5f6)',
+                industrial: 'linear-gradient(135deg, #ef9a9a, #e57373)',
+                park: 'linear-gradient(135deg, #a5d6a7, #81c784)',
+                infrastructure: 'linear-gradient(135deg, #b39ddb, #9575cd)',
+                educational: 'linear-gradient(135deg, #f48fb1, #f06292)',
+                environmental: 'linear-gradient(135deg, #80deea, #4dd0e1)',
+                power: 'linear-gradient(135deg, #fff59d, #ffeb3b)',
+                water: 'linear-gradient(135deg, #81d4fa, #4fc3f7)',
+                sewage: 'linear-gradient(135deg, #bcaaa4, #8d6e63)',
+                economic: 'linear-gradient(135deg, #ffcc80, #ffb74d)'
+            };
+            return colors[type] || 'linear-gradient(135deg, #b0bec5, #78909c)';
+        }
+
+        function getStatusForValue(value) {
+            if (value >= 80) return 'Excelente';
+            if (value >= 60) return 'Boa';
+            if (value >= 40) return 'Moderada';
+            if (value >= 20) return 'Baixa';
+            return 'Crítica';
+        }
+
+        // Sistema de autenticação simplificado
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showLoginError('Por favor, preencha nome de usuário e senha.');
+                return;
+            }
+            
+            // Simulação de autenticação
+            showLoginLoading(true);
+            
+            setTimeout(() => {
+                if (username.length >= 3 && password.length >= 8) {
+                    currentUser = { username: username };
+                    localStorage.setItem('ecosCityUser', JSON.stringify(currentUser));
+                    
+                    userName.textContent = username;
+                    loginContainer.style.display = 'none';
+                    registerContainer.style.display = 'none';
+                    gameContainer.style.display = 'block';
+                    loadGameState();
+                    startAutoSave();
+                    
+                    showLoginSuccess('Login realizado com sucesso!');
+                } else {
+                    showLoginError('Nome de usuário ou senha incorretos.');
+                }
+                showLoginLoading(false);
+            }, 1500);
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const email = document.getElementById('registerEmail').value.trim();
+            
+            if (!username || !password) {
+                showRegisterError('Por favor, preencha nome de usuário e senha.');
+                return;
+            }
+            
+            if (username.length < 3) {
+                showRegisterError('Nome de usuário deve ter pelo menos 3 caracteres.');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showRegisterError('A senha deve ter pelo menos 8 caracteres.');
+                return;
+            }
+            
+            showRegisterLoading(true);
+            
+            setTimeout(() => {
+                showRegisterSuccess('Conta criada com sucesso! Redirecionando para login...');
+                
+                setTimeout(() => {
+                    registerContainer.style.display = 'none';
+                    loginContainer.style.display = 'flex';
+                    clearMessages();
+                }, 2000);
+                
+                showRegisterLoading(false);
+            }, 1500);
+        }
+
+        function handleLogout() {
+            if (autoSaveInterval) {
+                clearInterval(autoSaveInterval);
+            }
+            localStorage.removeItem('ecosCityUser');
+            currentUser = null;
+            gameContainer.style.display = 'none';
+            loginContainer.style.display = 'flex';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function showLoginError(message) {
+            loginErrorMessage.textContent = message;
+            loginErrorMessage.style.display = 'block';
+            loginSuccessMessage.style.display = 'none';
+        }
+
+        function showRegisterError(message) {
+            registerErrorMessage.textContent = message;
+            registerErrorMessage.style.display = 'block';
+            registerSuccessMessage.style.display = 'none';
+        }
+
+        function showLoginSuccess(message) {
+            loginSuccessMessage.textContent = message;
+            loginSuccessMessage.style.display = 'block';
+            loginErrorMessage.style.display = 'none';
+        }
+
+        function showRegisterSuccess(message) {
+            registerSuccessMessage.textContent = message;
+            registerSuccessMessage.style.display = 'block';
+            registerErrorMessage.style.display = 'none';
+        }
+
+        function showLoginLoading(show) {
+            loginLoading.style.display = show ? 'block' : 'none';
+            loginBtn.disabled = show;
+        }
+
+        function showRegisterLoading(show) {
+            registerLoading.style.display = show ? 'block' : 'none';
+            registerBtn.disabled = show;
+        }
+
+        // Menu de Configurações
+        function toggleSettingsDropdown() {
+            settingsDropdown.classList.toggle('show');
+        }
+
+        function closeSettingsDropdown() {
+            settingsDropdown.classList.remove('show');
+        }
+
+        // Modal de Ranking
+        function showRankingModal() {
+            // Simulação de ranking
+            const ranking = [
+                { username: currentUser?.username || "Você", score: calculateScore(), turn: gameState.turn },
+                { username: "EcoMaster", score: 12500, turn: 15 },
+                { username: "GreenCity", score: 11000, turn: 12 },
+                { username: "Sustentável", score: 9800, turn: 10 },
+                { username: "Ambientalista", score: 8500, turn: 9 }
+            ];
+            
+            renderRanking(ranking);
+            rankingModal.classList.add('show');
+            closeSettingsDropdown();
+        }
+
+        function closeRankingModal() {
+            rankingModal.classList.remove('show');
+        }
+
+        function renderRanking(ranking) {
+            rankingList.innerHTML = '';
+            
+            if (ranking.length === 0) {
+                rankingList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Nenhum jogador no ranking ainda</p>';
+                return;
+            }
+            
+            // Ordenar por pontuação
+            ranking.sort((a, b) => b.score - a.score);
+            
+            ranking.forEach((player, index) => {
+                const item = document.createElement('div');
+                item.className = `ranking-item ${index < 3 ? 'top-' + (index + 1) : ''}`;
+                
+                item.innerHTML = `
+                    <div class="ranking-position ${index < 3 ? 'top-' + (index + 1) : ''}">${index + 1}</div>
+                    <div class="ranking-player">
+                        <div class="ranking-name">${player.username}</div>
+                        <div class="ranking-id">Rodada: ${player.turn}</div>
+                    </div>
+                    <div class="ranking-score">${player.score.toLocaleString()}</div>
+                `;
+                
+                rankingList.appendChild(item);
+            });
+        }
+
+        // Modal da Conta
+        function showAccountModal() {
+            if (!currentUser) return;
+            
+            renderAccountInfo();
+            accountModal.classList.add('show');
+            closeSettingsDropdown();
+        }
+
+        function closeAccountModal() {
+            accountModal.classList.remove('show');
+        }
+
+        function renderAccountInfo() {
+            accountInfo.innerHTML = `
+                <div class="account-field">
+                    <div class="account-label">Nome de Usuário</div>
+                    <div class="account-value">${currentUser.username}</div>
+                </div>
+                <div class="account-field">
+                    <div class="account-label">Pontuação Atual</div>
+                    <div class="account-value">${calculateScore().toLocaleString()} pontos</div>
+                </div>
+                <div class="account-field">
+                    <div class="account-label">Rodada Atual</div>
+                    <div class="account-value">${gameState.turn}</div>
+                </div>
+                <div class="account-field">
+                    <div class="account-label">Saldo</div>
+                    <div class="account-value">R$ ${gameState.balance.toLocaleString()}</div>
+                </div>
+                <div class="account-field">
+                    <div class="account-label">Construções</div>
+                    <div class="account-value">${gameState.constructions.length}</div>
+                </div>
+            `;
+        }
+
+        // Modal de Configurações
+        function showSettingsModal() {
+            // Atualizar valores dos sliders
+            volumeSlider.value = userSettings.volume;
+            musicSlider.value = userSettings.music;
+            volumeValue.textContent = userSettings.volume + '%';
+            musicValue.textContent = userSettings.music + '%';
+            
+            // Atualizar status do auto save
+            autoSaveStatus.textContent = userSettings.autoSave ? 'ON' : 'OFF';
+            autoSaveStatus.className = userSettings.autoSave ? 'save-status' : 'save-status off';
+            
+            settingsModal.classList.add('show');
+            closeSettingsDropdown();
+        }
+
+        function closeSettingsModal() {
+            settingsModal.classList.remove('show');
+        }
+
+        // Configurações de som
+        function setupSoundSettings() {
+            volumeSlider.addEventListener('input', function() {
+                userSettings.volume = this.value;
+                volumeValue.textContent = this.value + '%';
+                // Aqui você implementaria o controle de volume real
+            });
+
+            musicSlider.addEventListener('input', function() {
+                userSettings.music = this.value;
+                musicValue.textContent = this.value + '%';
+                // Aqui você implementaria o controle de música real
+            });
+
+            // Toggle auto save
+            autoSaveStatus.addEventListener('click', function() {
+                userSettings.autoSave = !userSettings.autoSave;
+                this.textContent = userSettings.autoSave ? 'ON' : 'OFF';
+                this.className = userSettings.autoSave ? 'save-status' : 'save-status off';
+                
+                if (userSettings.autoSave) {
+                    startAutoSave();
+                    showMessage("Auto Save", "Salvamento automático ativado!");
+                } else {
+                    if (autoSaveInterval) {
+                        clearInterval(autoSaveInterval);
+                    }
+                    showMessage("Auto Save", "Salvamento automático desativado!");
+                }
+            });
+        }
+
+        // Event Listeners
+        loginForm.addEventListener('submit', handleLogin);
+        registerForm.addEventListener('submit', handleRegister);
+        logoutBtn.addEventListener('click', handleLogout);
+        settingsBtn.addEventListener('click', toggleSettingsDropdown);
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.settings-menu')) {
+                closeSettingsDropdown();
+            }
+        });
+
+        // Verificar se já está logado ao carregar a página
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuthState();
+            setupSoundSettings();
+        });
+
+        // Tornar funções globais para os eventos onclick
+        window.showAccountModal = showAccountModal;
+        window.showRankingModal = showRankingModal;
+        window.showSettingsModal = showSettingsModal;
+        window.closeRankingModal = closeRankingModal;
+        window.closeAccountModal = closeAccountModal;
+        window.closeSettingsModal = closeSettingsModal;
+        window.saveGameManually = saveGameManually;
+    </script>
+</body>
+</html>
